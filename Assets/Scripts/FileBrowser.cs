@@ -9,7 +9,6 @@ using TMPro;
 
 public class FileBrowser : MonoBehaviour
 {
-
     //UI
     public GameObject prefab;
     public GameObject folderPanel;
@@ -84,7 +83,7 @@ public class FileBrowser : MonoBehaviour
     {
         foreach (string file in Directory.GetFiles(currentPath))
         {
-            if (extensions.Contains(Path.GetExtension(file)))
+            if (extensions.Contains(Path.GetExtension(file).ToLower()))
                 files.Add(file);
         }
     }
@@ -107,18 +106,30 @@ public class FileBrowser : MonoBehaviour
 
     IEnumerator RefreshDirectories()
     {
-        for (int i = 0; i < directories.Count; i++)
+        int count = directories.Count;
+        List<int> directoryIndices = new List<int>();
+
+        for (int i = 0; i < count; i++)
+            directoryIndices.Add(i);
+
+        foreach (int index in directoryIndices)
         {
-            AddDirectoryItem(i);
+            AddDirectoryItem(index);
             yield return null;
         }
     }
 
     IEnumerator RefreshFiles()
     {
-        for (int i = 0; i < files.Count; i++)
+        int count = files.Count;
+        List<int> fileIndeces = new List<int>();
+
+        for (int i = 0; i < count; i++)
+            fileIndeces.Add(i);
+
+        foreach (int index in fileIndeces)
         {
-            AddFileItem(i);
+            AddFileItem(index);
             yield return null;
         }
     }
@@ -134,10 +145,8 @@ public class FileBrowser : MonoBehaviour
             OnDirectorySelected(index);
         });
 
-        if (selectDrive)
-            item.GetComponentInChildren<TextMeshProUGUI>().text = directories[index];
-        else
-            item.GetComponentInChildren<TextMeshProUGUI>().text = Path.GetFileName(directories[index]);
+        string textToShow = selectDrive ? directories[index] : Path.GetFileName(directories[index]);
+        item.GetComponentInChildren<TextMeshProUGUI>().text = textToShow;
 
         item.transform.SetParent(folderPanel.transform, false);
 
@@ -145,15 +154,8 @@ public class FileBrowser : MonoBehaviour
 
     private void OnDirectorySelected(int index)
     {
-        if (selectDrive)
-        {
-            currentPath = hardDrive[index];
-            selectDrive = false;
-        }
-        else
-        {
-            currentPath = directories[index];
-        }
+        currentPath = selectDrive ? hardDrive[index] : directories[index];
+        selectDrive = false;
 
         textPath.text = currentPath;
 
@@ -206,38 +208,39 @@ public class FileBrowser : MonoBehaviour
 
         scrollRect.movementType = ScrollRect.MovementType.Elastic;
 
-        if (selected != null)
+        if (selected != null && selected.transform.IsChildOf(transform))
         {
-            if (selected.transform.IsChildOf(transform))
+            if (Input.GetKeyDown(KeyCode.Joystick1Button1) || Input.GetKeyDown(KeyCode.Escape))
             {
-                if (Input.GetKeyDown(KeyCode.Joystick1Button1) || Input.GetKeyDown(KeyCode.Escape))
-                    //Up();
-
-                    if (Mathf.Abs(Input.GetAxis("Vertical")) > .3f)
-                    {
-                        if (selected.transform.IsChildOf(transform))
-                        {
-                            scrollRect.movementType = ScrollRect.MovementType.Clamped;
-                            RectTransform rt = selected.GetComponent<RectTransform>();
-                            Vector2 dif = scrollRect.transform.position - rt.position;
-
-                            if (Mathf.Abs(dif.y) > .5f)
-                            {
-                                Vector2 scrollVelocity = Vector2.zero;
-                                scrollVelocity.y = dif.y * 3;
-                                scrollRect.velocity = scrollVelocity;
-                            }
-
-                            scrolling = true;
-                        }
-                    }
-                    else if (scrolling)
-                    {
-                        if (scrollRect.verticalNormalizedPosition > .99f || scrollRect.verticalNormalizedPosition < .01f)
-                            scrollRect.StopMovement();
-                        scrolling = false;
-                    }
+                if (Mathf.Abs(Input.GetAxis("Vertical")) > .3f)
+                    ScrollIfNecessary(selected);
+                else
+                    StopScrolling();
             }
         }
+    }
+
+    void ScrollIfNecessary(GameObject selected)
+    {
+        scrollRect.movementType = ScrollRect.MovementType.Clamped;
+        RectTransform rt = selected.GetComponent<RectTransform>();
+        Vector2 dif = scrollRect.transform.position - rt.position;
+
+        if (Mathf.Abs(dif.y) > .5f)
+        {
+            Vector2 scrollVelocity = Vector2.zero;
+            scrollVelocity.y = dif.y * 3;
+            scrollRect.velocity = scrollVelocity;
+        }
+
+        scrolling = true;
+    }
+
+    void StopScrolling()
+    {
+        if (scrolling && (scrollRect.verticalNormalizedPosition > .99f || scrollRect.verticalNormalizedPosition < .01f))
+            scrollRect.StopMovement();
+
+        scrolling = false;
     }
 }
