@@ -6,15 +6,11 @@
 
 Explorador de archivos para realidad virtual y modo 2D.
 
-Modo 2D
+Preview
 
-![Explorador de archivos modo 2D](https://raw.githubusercontent.com/NocSchecter/UnityFileBrowser/develop/screens/2DTest.gif)
+![Explorador de archivos modo VR](https://raw.githubusercontent.com/NocSchecter/UnityFileBrowser/develop/screens/Preview.mp4)
 
-Modo VR
-
-![Explorador de archivos modo VR](https://raw.githubusercontent.com/NocSchecter/UnityFileBrowser/develop/screens/VRTest.gif)
-
-# Característica
+# Características
 
 1. Navegar por los directorios y archivos del sistema de archivos.
 2. Seleccionar un archivo y recibir una notificación del evento de selección a través de un evento
@@ -23,7 +19,7 @@ Modo VR
 5. Interfaz sencilla de usar
 6. Reproductor de video (Su interfaz está muy sosa, estoy trabajando en eso)
 
-# Componentes necesarios para su funcionamiento:
+# Componentes necesarios para su funcionamiento
 
 1. Unity 2020.3.12f1 o superior
 2. Oculus XR Plugin 1.11.2
@@ -60,7 +56,7 @@ Ejemplo de cómo suscribirte desde otro script:
 # Funciones que se agregaran mas adelante
 
 1. Controles y mejor interfaz para el reproductor de video
-2. Reproducir video Plano y 360
+2. Reproducir video Plano
 3. Playlist (Crear, añadir, eliminar, guardar y cargar)
 4. Soporte para el sistema de ficheros de Android
 5. Ejemplos para cargar archivos de audio, imágenes, texto, etc.
