@@ -9,7 +9,8 @@ using TMPro;
 
 public class FileBrowser : MonoBehaviour
 {
-    //UI
+    #region UI
+
     public GameObject prefab;
     public GameObject folderPanel;
     public GameObject filePanel;
@@ -17,31 +18,47 @@ public class FileBrowser : MonoBehaviour
     public TextMeshProUGUI textPath;
     private bool scrolling;
 
-    //Hard drives
+    #endregion
+
+    #region HARD DRIVES
+
     private string[] hardDrive;
     private List<string> directories;
-    private string currentPath;
+    [SerializeField] private string currentPath;
     private List<string> files;
     public string currentFile;
     public List<string> extensions;
     private bool selectDrive;
 
-    //Events
+    #endregion
+
+    #region EVENTS
+
     public delegate void FileSelectedEventHandler(string path);
     public static event FileSelectedEventHandler FileSelected;
 
+    #endregion
+
+    #region FILE SYSTEM METHODS
+
     public void Up()
     {
+        if(currentPath == string.Empty)
+            return;
+
         if (currentPath == Path.GetPathRoot(currentPath))
         {
             selectDrive = true;
+
             ClearFolderContent();
             ClearFileContent();
             Build();
+
+            textPath.text = "";
         }
         else
         {
-            currentPath = Directory.GetParent(currentPath).FullName;
+            currentPath = Directory.GetParent(currentPath)?.FullName;
 
             ClearFolderContent();
             ClearFileContent();
@@ -49,6 +66,22 @@ public class FileBrowser : MonoBehaviour
         }
 
         textPath.text = currentPath;
+    }
+
+    public void GoToRoot()
+    {
+        string rootPath = Path.GetPathRoot(currentPath);
+        if (rootPath != null && rootPath != "")
+        {
+            selectDrive = true;
+            currentPath = "";
+
+            ClearFolderContent();
+            ClearFileContent();
+            Build();
+
+            textPath.text = currentPath;
+        }
     }
 
     private void Build()
@@ -189,7 +222,10 @@ public class FileBrowser : MonoBehaviour
         currentFile = path;
     }
 
-    //Metodos de incializacion
+    #endregion
+
+    #region UNITY EVENTS
+
     private void Awake()
     {
         directories = new List<string>();
@@ -220,6 +256,10 @@ public class FileBrowser : MonoBehaviour
         }
     }
 
+    #endregion
+
+    #region UI UPDATE
+
     void ScrollIfNecessary(GameObject selected)
     {
         scrollRect.movementType = ScrollRect.MovementType.Clamped;
@@ -243,4 +283,6 @@ public class FileBrowser : MonoBehaviour
 
         scrolling = false;
     }
+
+    #endregion
 }
